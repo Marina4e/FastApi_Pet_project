@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect("books.db")
+conn = sqlite3.connect("../crud_app_a/books.db")
 cursor = conn.cursor()
 
 cursor.execute("SELECT * FROM books")

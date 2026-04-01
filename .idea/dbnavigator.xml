@@ -14,6 +14,9 @@
       <assistant-state connection-id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2" default-profile-name="" selected-conversation-id="" assistant-type="GENERIC" availability="UNAVAILABLE" acknowledgement="NONE">
         <conversations />
       </assistant-state>
+      <assistant-state connection-id="ce6b8164-3ee4-4ee0-ac4e-130e8b7a0ed4" default-profile-name="" selected-conversation-id="" assistant-type="GENERIC" availability="UNAVAILABLE" acknowledgement="NONE">
+        <conversations />
+      </assistant-state>
     </assistants>
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
@@ -23,23 +26,32 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2">
-      <console name="Connection" type="STANDARD" schema="main" session="Main" />
+    <connection id="ce6b8164-3ee4-4ee0-ac4e-130e8b7a0ed4">
+      <console name="BooksFastApi" type="STANDARD" schema="main" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2" object-ref="schemas/main/tables/books" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2" />
+    <connection id="ce6b8164-3ee4-4ee0-ac4e-130e8b7a0ed4" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2" dataset="main.books" active-filter-id="EMPTY_FILTER" />
+  </component>
+  <component name="DBNavigator.Project.ExecutionManager">
+    <retain-sticky-names value="false" />
+  </component>
+  <component name="DBNavigator.Project.MethodExecutionManager">
+    <method-browser />
+    <execution-history>
+      <group-entries value="true" />
+      <execution-inputs />
+    </execution-history>
+    <execution-variables-cache />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -47,9 +59,9 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection source-id="" id="25c8c311-ac10-4fa3-aa3d-bee968ce93f2" active="true" signed="true">
+      <connection source-id="" id="ce6b8164-3ee4-4ee0-ac4e-130e8b7a0ed4" active="true" signed="true">
         <database>
-          <name value="Connection" />
+          <name value="BooksFastApi" />
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />
@@ -57,18 +69,8 @@
           <driver-source value="BUNDLED" />
           <driver-library value="" />
           <driver value="" />
-          <url-type value="FILE" />
-          <host value="" />
-          <port value="" />
-          <database value="" />
-          <tns-folder value="" />
-          <tns-profile value="" />
-          <server-type value="" />
-          <protocol value="" />
-          <url-parameters />
-          <files>
-            <file path="D:\PyCharmPROJECTS\FastApi_1\crud_app_a\books.db" schema="main" />
-          </files>
+          <url-type value="CUSTOM" />
+          <url value="jdbc:sqlite:D:\PyCharmPROJECTS\FastApi_1\app.db" />
           <type value="NONE" />
           <user value="" />
           <token-type value="" />

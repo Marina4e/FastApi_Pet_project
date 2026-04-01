@@ -1,0 +1,52 @@
+🔐 3. Як працює авторизація (ПО КРОКАМ)
+1️⃣ Реєстрація
+
+POST:
+/register
+Body:
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+2️⃣ Логін
+
+POST:
+/login
+Body:
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+👉 Отримаєш:
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs..."
+}
+3️⃣ Авторизація в Swagger
+👉 Натискаєш Authorize 🔒
+
+Вставляєш:
+
+Bearer ТВОЙ_ТОКЕН
+📚 4. Додати книги
+
+POST:
+
+/books/
+
+Query params (важливо!):
+
+title=Atomic Habits
+author=James Clear
+year=2018
+✍️ 5. Ось 5 книг для тесту
+Atomic Habits — James Clear — 2018
+Clean Code — Robert Martin — 2008
+The Pragmatic Programmer — Andrew Hunt — 1999
+Deep Work — Cal Newport — 2016
+Design Patterns — Erich Gamma — 1994
+📖 6. Подивитись книги
+
+GET:
+
+/books/

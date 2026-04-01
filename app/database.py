@@ -1,10 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-
-DATABASE_URL = "sqlite:///./jwt_auth2_app_b.db"
+from app.settings import settings
 
 engine = create_engine(
-    DATABASE_URL,
+    settings.DATABASE_URL,
     connect_args={"check_same_thread": False}
 )
 
