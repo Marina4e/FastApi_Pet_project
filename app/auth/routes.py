@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.database import SessionLocal
 from app.models import User
 from app.auth.schemas import UserCreate
-from app.auth.jwt import create_access_token
+from app.auth.jwt import create_access_token, create_refresh_token
 
 router = APIRouter()
 
@@ -35,7 +35,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     new_user = User(
         email=user.email,
-        hashed_password=pwd_context.hash(user.password)
+        hashed_password=pwd_context.hash(user.password),
+        role=user.role if user.role else "user"  # 👈 тут магія
     )
 
     db.add(new_user)
@@ -44,13 +45,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     return {"msg": "User created"}
 
 
-# 🔥 LOGIN (ОСЬ ТУТ ГОЛОВНА ЗМІНА)
 @router.post("/login")
 def login(
         form_data: OAuth2PasswordRequestForm = Depends(),
         db: Session = Depends(get_db)
 ):
-    email = form_data.username  # ⚠️ тут username = email
+    email = form_data.username
     password = form_data.password
 
     db_user = get_user(db, email)
@@ -58,9 +58,45 @@ def login(
     if not db_user or not pwd_context.verify(password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
-    token = create_access_token({"sub": email})
+    access_token = create_access_token({
+        "sub": email,
+        "role": db_user.role
+    })
+
+    refresh_token = create_refresh_token({
+        "sub": email
+    })
 
     return {
-        "access_token": token,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer"
     }
+
+from app.dependencies import get_current_user
+
+
+@router.get("/me")
+def get_me(current_user=Depends(get_current_user)):
+    return {
+        "email": current_user.email,
+        "role": current_user.role
+    }
+
+from app.auth.jwt import verify_token
+
+
+@router.post("/refresh")
+def refresh_token(refresh_token: str):
+    payload = verify_token(refresh_token)
+
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    email = payload.get("sub")
+
+    new_access_token = create_access_token({
+        "sub": email
+    })
+
+    return {"access_token": new_access_token}
