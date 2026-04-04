@@ -6,7 +6,8 @@ POST:
 Body:
 {
   "email": "test@test.com",
-  "password": "123456"
+  "password": "123456",
+  "role": "admin"
 }
 2️⃣ Логін
 
@@ -15,12 +16,15 @@ POST:
 Body:
 {
   "email": "test@test.com",
-  "password": "123456"
+  "password": "123456",
+  "role": "admin"
 }
 
 👉 Отримаєш:
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIs..."
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzc1Mjk5MjU4fQ.avnNpjkzaKBzcfVWnxodmo7.....",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiZXhwIjoxNzc1OTAyMjU4fQ.H8Myr2PgZQnOy3DNos8wigE.....",
+  "token_type": "bearer"
 }
 3️⃣ Авторизація в Swagger
 👉 Натискаєш Authorize 🔒
@@ -31,11 +35,8 @@ Bearer ТВОЙ_ТОКЕН
 📚 4. Додати книги
 
 POST:
-
 /books/
-
 Query params (важливо!):
-
 title=Atomic Habits
 author=James Clear
 year=2018
@@ -46,7 +47,5 @@ The Pragmatic Programmer — Andrew Hunt — 1999
 Deep Work — Cal Newport — 2016
 Design Patterns — Erich Gamma — 1994
 📖 6. Подивитись книги
-
 GET:
-
 /books/

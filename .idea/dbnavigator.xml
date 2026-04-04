@@ -37,12 +37,13 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="0c175db4-1cbc-4009-b65e-d46dbd9ba500" object-ref="consoles/Connection" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="0c175db4-1cbc-4009-b65e-d46dbd9ba500" />
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="0c175db4-1cbc-4009-b65e-d46dbd9ba500" dataset="main.books" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -66,7 +67,7 @@
     <connections>
       <connection source-id="" id="0c175db4-1cbc-4009-b65e-d46dbd9ba500" active="true" signed="true">
         <database>
-          <name value="Connection" />
+          <name value="Connection Books" />
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />
