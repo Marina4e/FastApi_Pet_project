@@ -1,4 +1,7 @@
 import uuid
+from app.settings import settings
+print("DB:", settings.DATABASE_URL)
+
 
 def test_register(client):
     email = f"new_{uuid.uuid4()}@test.com"

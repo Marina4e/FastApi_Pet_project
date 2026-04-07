@@ -1,7 +1,9 @@
 import os
+
 os.environ["ENV"] = "test"
 
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import pytest
@@ -14,9 +16,18 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+from app.database import Base, engine
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_db():
+    Base.metadata.create_all(bind=engine)
+
+
 @pytest.fixture
 def client():
     return TestClient(app)
+
 
 @pytest.fixture
 def db():
@@ -47,3 +58,16 @@ def admin_test(db):
     db.add(user)
     db.commit()
     return user
+
+
+@pytest.fixture
+def get_token(client):
+    def _get_token(email, password):
+        res = client.post("/login", data={
+            "username": email,
+            "password": password
+        })
+        assert res.status_code == 200
+        return res.json()["access_token"]
+
+    return _get_token
