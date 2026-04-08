@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Dashboard</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background:#f5f5f5 }
+        .section { background:white; padding:15px; margin-bottom:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+        input, button { margin:5px; padding:8px }
+        button { cursor:pointer; border:none; border-radius:5px }
+        .success { background:#4CAF50; color:white }
+        .error { background:#f44336; color:white }
+        .default { background:#2196F3; color:white }
+        pre { background:#222; color:#0f0; padding:10px; border-radius:5px; max-height:200px; overflow:auto }
+    </style>
+</head>
+<body>
+
+<h1>🚀 API Dashboard</h1>
+
+<div class="section">
+    <h2>Register</h2>
+    <input id="reg_email" placeholder="email">
+    <input id="reg_pass" placeholder="password" type="password">
+    <button id="reg_btn" class="default" onclick="register()">Register</button>
+</div>
+
+<div class="section">
+    <h2>Login</h2>
+    <input id="login_email" placeholder="email">
+    <input id="login_pass" placeholder="password" type="password">
+    <button id="login_btn" class="default" onclick="login()">Login</button>
+</div>
+
+<div class="section">
+    <h2>Create Article</h2>
+    <input id="art_title" placeholder="title">
+    <input id="art_content" placeholder="content">
+    <button id="create_btn" class="default" onclick="createArticle()">Create</button>
+</div>
+
+<div class="section">
+    <h2>Articles</h2>
+    <button onclick="getArticles()">Load Articles</button>
+    <pre id="articles"></pre>
+</div>
+
+<div class="section">
+    <h2>User Info</h2>
+    <input id="user_id" placeholder="user id">
+    <button onclick="getUserFull()">Get</button>
+    <pre id="user_full"></pre>
+</div>
+
+<script>
+    let token = "";
+
+    function setStatus(btn, success) {
+      btn.classList.remove('default','success','error');
+      btn.classList.add(success ? 'success' : 'error');
+    }
+
+    async function register() {
+      const btn = document.getElementById('reg_btn');
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            email: reg_email.value,
+            password: reg_pass.value
+          })
+        });
+        setStatus(btn, res.ok);
+      } catch {
+        setStatus(btn, false);
+      }
+    }
+
+    async function login() {
+      const btn = document.getElementById('login_btn');
+      const form = new URLSearchParams();
+      form.append('username', login_email.value);
+      form.append('password', login_pass.value);
+
+      try {
+        const res = await fetch('/login', {method:'POST', body:form});
+        const data = await res.json();
+        token = data.access_token;
+        setStatus(btn, res.ok);
+      } catch {
+        setStatus(btn, false);
+      }
+    }
+
+    async function createArticle() {
+      const btn = document.getElementById('create_btn');
+      try {
+        const res = await fetch('/articles/', {
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer '+token
+          },
+          body: JSON.stringify({
+            title: art_title.value,
+            content: art_content.value
+          })
+        });
+        setStatus(btn, res.ok);
+      } catch {
+        setStatus(btn, false);
+      }
+    }
+
+    async function getArticles() {
+      const res = await fetch('/articles/', {
+        headers:{'Authorization':'Bearer '+token}
+      });
+      const data = await res.json();
+      document.getElementById('articles').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function getUserFull() {
+      const id = user_id.value;
+      const res = await fetch(`/articles/user-full/${id}`, {
+        headers:{'Authorization':'Bearer '+token}
+      });
+      const data = await res.json();
+      document.getElementById('user_full').innerText = JSON.stringify(data, null, 2);
+    }
+</script>
+
+</body>
+</html>
