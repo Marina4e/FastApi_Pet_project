@@ -23,10 +23,6 @@
     <h2>Register</h2>
     <input id="reg_email" placeholder="email">
     <input id="reg_pass" placeholder="password" type="password">
-    <select id="reg_role">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-    </select>
     <button id="reg_btn" class="default" onclick="register()">Register</button>
 </div>
 
@@ -100,13 +96,10 @@
 
 <div class="section">
     <h2>Update Book</h2>
-    <select id="book_select"></select>
-    <button class="default" onclick="loadBookToUpdate()">Load Book</button>
-
+    <input id="book_id_update" placeholder="book id">
     <input id="book_title_update" placeholder="title">
     <input id="book_author_update" placeholder="author">
     <input id="book_year_update" placeholder="year">
-
     <button id="update_book_btn" class="default" onclick="updateBook()">Update Book</button>
     <pre id="book_update"></pre>
 </div>
@@ -119,238 +112,215 @@
 </div>
 
 <script>
-    let token = localStorage.getItem('token') || "";
+let token = localStorage.getItem('token') || "";
 
-    function setStatus(btn, success) {
-      btn.classList.remove('default','success','error');
-      btn.classList.add(success ? 'success' : 'error');
-    }
+function setStatus(btn, success) {
+  btn.classList.remove('default','success','error');
+  btn.classList.add(success ? 'success' : 'error');
+}
 
-    async function register() {
-      const btn = document.getElementById('reg_btn');
-      try {
-        const res = await fetch('/register', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({
-            email: reg_email.value,
-            password: reg_pass.value,
-            role: reg_role.value
-          })
-        });
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(await res.text());
-      } catch {
-        setStatus(btn, false);
-      }
-    }
+async function register() {
+  const btn = document.getElementById('reg_btn');
+  try {
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email: reg_email.value,
+        password: reg_pass.value
+      })
+    });
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(await res.text());
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function login() {
-      const btn = document.getElementById('login_btn');
-      const form = new URLSearchParams();
-      form.append('username', login_email.value);
-      form.append('password', login_pass.value);
+async function login() {
+  const btn = document.getElementById('login_btn');
+  const form = new URLSearchParams();
+  form.append('username', login_email.value);
+  form.append('password', login_pass.value);
 
-      try {
-        const res = await fetch('/login', {method:'POST', body:form});
-        const data = await res.json();
-        token = data.access_token;
-        localStorage.setItem('token', token);
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(JSON.stringify(data));
-      } catch {
-        setStatus(btn, false);
-      }
-    }
+  try {
+    const res = await fetch('/login', {method:'POST', body:form});
+    const data = await res.json();
+    token = data.access_token;
+    localStorage.setItem('token', token);
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(JSON.stringify(data));
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function createArticle() {
-      const btn = document.getElementById('create_btn');
-      try {
-        const res = await fetch('/articles/', {
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':'Bearer '+token
-          },
-          body: JSON.stringify({
-            title: art_title.value,
-            content: art_content.value
-          })
-        });
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(await res.text());
-      } catch {
-        setStatus(btn, false);
-      }
-    }
+async function createArticle() {
+  const btn = document.getElementById('create_btn');
+  try {
+    const res = await fetch('/articles/', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+token
+      },
+      body: JSON.stringify({
+        title: art_title.value,
+        content: art_content.value
+      })
+    });
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(await res.text());
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function getArticles() {
-      const res = await fetch('/articles/', {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
-      document.getElementById('articles').innerText = JSON.stringify(data, null, 2);
-    }
+async function getArticles() {
+  const res = await fetch('/articles/', {
+    headers:{'Authorization':'Bearer '+token}
+  });
+  const data = await res.json();
+  document.getElementById('articles').innerText = JSON.stringify(data, null, 2);
+}
 
-    async function followUser() {
-      const btn = document.getElementById('follow_btn');
-      const id = follow_id.value;
-      try {
-        const res = await fetch(`/articles/follow/${id}`, {
-          method:'POST',
-          headers:{'Authorization':'Bearer '+token}
-        });
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(await res.text());
-      } catch {
-        setStatus(btn, false);
-      }
-    }
+async function followUser() {
+  const btn = document.getElementById('follow_btn');
+  const id = follow_id.value;
+  try {
+    const res = await fetch(`/articles/follow/${id}`, {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+token}
+    });
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(await res.text());
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function getFollowers() {
-      const id = followers_id.value;
-      const res = await fetch(`/articles/followers/${id}`, {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
-      document.getElementById('followers').innerText = JSON.stringify(data, null, 2);
-    }
+async function getFollowers() {
+  const id = followers_id.value;
+  const res = await fetch(`/articles/followers/${id}`, {
+    headers:{'Authorization':'Bearer '+token}
+  });
+  const data = await res.json();
+  document.getElementById('followers').innerText = JSON.stringify(data, null, 2);
+}
 
-    async function getFollowing() {
-      const id = following_id.value;
-      const res = await fetch(`/articles/following/${id}`, {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
-      document.getElementById('following').innerText = JSON.stringify(data, null, 2);
-    }
+async function getFollowing() {
+  const id = following_id.value;
+  const res = await fetch(`/articles/following/${id}`, {
+    headers:{'Authorization':'Bearer '+token}
+  });
+  const data = await res.json();
+  document.getElementById('following').innerText = JSON.stringify(data, null, 2);
+}
 
-    async function getUserFull() {
-      const id = user_id.value;
-      const res = await fetch(`/articles/user-full/${id}`, {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
-      document.getElementById('user_full').innerText = JSON.stringify(data, null, 2);
-    }
+async function getUserFull() {
+  const id = user_id.value;
+  const res = await fetch(`/articles/user-full/${id}`, {
+    headers:{'Authorization':'Bearer '+token}
+  });
+  const data = await res.json();
+  document.getElementById('user_full').innerText = JSON.stringify(data, null, 2);
+}
 
-    // BOOKS
+// BOOKS
 
-    async function loadBookToUpdate() {
-      const id = document.getElementById('book_select').value;
-      const res = await fetch(`/books/${id}`, {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
+async function createBook() {
+  const btn = document.getElementById('book_create');
+  try {
+    const res = await fetch('/books/', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+token
+      },
+      body: JSON.stringify({
+        title: book_title.value,
+        author: book_author.value,
+        year: parseInt(book_year.value)
+      })
+    });
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(await res.text());
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-      book_title_update.value = data.title;
-      book_author_update.value = data.author;
-      book_year_update.value = data.year;
-    }
+async function getBooks() {
+  const res = await fetch('/books/', {
+    headers:{'Authorization':'Bearer '+token}
+  });
+  const data = await res.json();
+  document.getElementById('books').innerText = JSON.stringify(data, null, 2);
+}
 
-    async function createBook() {
-      const btn = document.getElementById('book_create');
-      try {
-        const res = await fetch('/books/', {
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':'Bearer '+token
-          },
-          body: JSON.stringify({
-            title: book_title.value,
-            author: book_author.value,
-            year: parseInt(book_year.value)
-          })
-        });
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(await res.text());
-      } catch {
-        setStatus(btn, false);
-      }
-    }
+async function getBook() {
+  const btn = document.getElementById('get_book_btn');
+  const id = book_id_get.value;
+  try {
+    const res = await fetch(`/books/${id}`, {
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data = await res.json();
+    document.getElementById('book_one').innerText = JSON.stringify(data, null, 2);
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(JSON.stringify(data));
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function getBooks() {
-      const res = await fetch('/books/', {
-        headers:{'Authorization':'Bearer '+token}
-      });
-      const data = await res.json();
-      document.getElementById('books').innerText = JSON.stringify(data, null, 2);
+async function updateBook() {
+  const btn = document.getElementById('update_book_btn');
+  const id = book_id_update.value;
+  try {
+    const res = await fetch(`/books/${id}`, {
+      method:'PUT',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+token
+      },
+      body: JSON.stringify({
+        title: book_title_update.value,
+        author: book_author_update.value,
+        year: parseInt(book_year_update.value)
+      })
+    });
+    const text = await res.text();
+    document.getElementById('book_update').innerText = text;
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(text);
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-      // заполнение select
-      const select = document.getElementById('book_select');
-      select.innerHTML = '';
-      data.forEach(book => {
-        const option = document.createElement('option');
-        option.value = book.id;
-        option.text = `ID ${book.id} - ${book.title}`;
-        select.appendChild(option);
-      });
-    }
+async function deleteBook() {
+  const btn = document.getElementById('delete_book_btn');
+  const id = book_id_delete.value;
+  try {
+    const res = await fetch(`/books/${id}`, {
+      method:'DELETE',
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const text = await res.text();
+    document.getElementById('book_delete').innerText = text;
+    setStatus(btn, res.ok);
+    if (!res.ok) alert(text);
+  } catch {
+    setStatus(btn, false);
+  }
+}
 
-    async function getBook() {
-      const btn = document.getElementById('get_book_btn');
-      const id = book_id_get.value;
-      try {
-        const res = await fetch(`/books/${id}`, {
-          headers:{'Authorization':'Bearer '+token}
-        });
-        const data = await res.json();
-        document.getElementById('book_one').innerText = JSON.stringify(data, null, 2);
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(JSON.stringify(data));
-      } catch {
-        setStatus(btn, false);
-      }
-    }
-
-    async function updateBook() {
-      const btn = document.getElementById('update_book_btn');
-      const id = document.getElementById('book_select').value;
-      try {
-        const res = await fetch(`/books/${id}`, {
-          method:'PUT',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':'Bearer '+token
-          },
-          body: JSON.stringify({
-            title: book_title_update.value,
-            author: book_author_update.value,
-            year: parseInt(book_year_update.value)
-          })
-        });
-        const text = await res.text();
-        document.getElementById('book_update').innerText = text;
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(text);
-      } catch {
-        setStatus(btn, false);
-      }
-    }
-
-    async function deleteBook() {
-      const btn = document.getElementById('delete_book_btn');
-      const id = book_id_delete.value;
-      try {
-        const res = await fetch(`/books/${id}`, {
-          method:'DELETE',
-          headers:{'Authorization':'Bearer '+token}
-        });
-        const text = await res.text();
-        document.getElementById('book_delete').innerText = text;
-        setStatus(btn, res.ok);
-        if (!res.ok) alert(text);
-      } catch {
-        setStatus(btn, false);
-      }
-    }
-
-    function logout() {
-      token = "";
-      localStorage.removeItem('token');
-      alert('Logged out');
-    }
+function logout() {
+  token = "";
+  localStorage.removeItem('token');
+  alert('Logged out');
+}
 
 </script>
 

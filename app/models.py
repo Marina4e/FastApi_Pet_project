@@ -6,10 +6,8 @@ from .database import Base
 followers_association = Table(
     "followers",
     Base.metadata,
-    Column("follower_id", Integer,
-           ForeignKey("users.id")),
-    Column("followed_id", Integer,
-           ForeignKey("users.id")),
+    Column("follower_id", Integer, ForeignKey("users.id")),
+    Column("followed_id", Integer, ForeignKey("users.id")),
 )
 
 
@@ -24,8 +22,7 @@ class User(Base):
     books = relationship("Book", back_populates="owner")
 
     # 🔗 One-to-Many
-    articles = relationship("Article", back_populates="owner",
-                            cascade="all, delete")
+    articles = relationship("Article", back_populates="owner", cascade="all, delete")
 
     # 🔗 Many-to-Many (подписки)
     following = relationship(

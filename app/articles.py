@@ -109,7 +109,6 @@ def get_following(
 
     return user_db.following
 
-
 @router.get("/user-full/{user_id}", response_model=UserDetail)
 def get_user_full(
         user_id: int,

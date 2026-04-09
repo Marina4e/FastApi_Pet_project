@@ -1,16 +1,18 @@
 import os
+
 from app.auth.routes import get_db
 
 os.environ["ENV"] = "test"
 
 import sys
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.main import app
 from app.models import Base, User
 from passlib.context import CryptContext
@@ -38,9 +40,7 @@ def override_get_db():
     finally:
         db.close()
 
-
 app.dependency_overrides[get_db] = override_get_db
-
 
 # ✅ ФИКСТУРА БД (ОДНА!)
 @pytest.fixture(scope="function")
@@ -65,7 +65,7 @@ def client():
 @pytest.fixture
 def user_test(db):
     user = User(
-        email="user{uuid.uuid4()}@test.com",
+        email=f"user{uuid.uuid4()}@test.com",
         hashed_password=pwd_context.hash("123456"),
         role="user"
     )
@@ -79,7 +79,7 @@ def user_test(db):
 @pytest.fixture
 def admin_test(db):
     user = User(
-        email="admin{uuid.uuid4()}@test.com",
+        email=f"admin{uuid.uuid4()}@test.com",
         hashed_password=pwd_context.hash("123456"),
         role="admin"
     )
