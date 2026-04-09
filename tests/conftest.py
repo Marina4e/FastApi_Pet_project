@@ -5,18 +5,20 @@ from app.auth.routes import get_db
 os.environ["ENV"] = "test"
 
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-import pytest
 import uuid
+
+import pytest
 from fastapi.testclient import TestClient
+from passlib.context import CryptContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.models import Base, User
-from passlib.context import CryptContext
-from sqlalchemy.pool import StaticPool
 
 # 🔐 пароль
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -40,7 +42,9 @@ def override_get_db():
     finally:
         db.close()
 
+
 app.dependency_overrides[get_db] = override_get_db
+
 
 # ✅ ФИКСТУРА БД (ОДНА!)
 @pytest.fixture(scope="function")
@@ -67,7 +71,7 @@ def user_test(db):
     user = User(
         email=f"user{uuid.uuid4()}@test.com",
         hashed_password=pwd_context.hash("123456"),
-        role="user"
+        role="user",
     )
     db.add(user)
     db.commit()
@@ -81,7 +85,7 @@ def admin_test(db):
     user = User(
         email=f"admin{uuid.uuid4()}@test.com",
         hashed_password=pwd_context.hash("123456"),
-        role="admin"
+        role="admin",
     )
     db.add(user)
     db.commit()
@@ -93,10 +97,7 @@ def admin_test(db):
 @pytest.fixture
 def get_token(client):
     def _get_token(email, password):
-        res = client.post("/login", data={
-            "username": email,
-            "password": password
-        })
+        res = client.post("/login", data={"username": email, "password": password})
         assert res.status_code == 200
         return res.json()["access_token"]
 
