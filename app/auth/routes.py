@@ -7,6 +7,8 @@ from app.database import SessionLocal
 from app.models import User
 from app.auth.schemas import UserCreate
 from app.auth.jwt import create_access_token, create_refresh_token
+from app.dependencies import get_current_user
+from app.auth.jwt import verify_token
 
 router = APIRouter()
 
@@ -36,7 +38,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         email=user.email,
         hashed_password=pwd_context.hash(user.password),
-        role=user.role if user.role else "user"  # 👈 тут магія
+        role=user.role if user.role else "user"
     )
 
     db.add(new_user)
@@ -55,7 +57,8 @@ def login(
 
     db_user = get_user(db, email)
 
-    if not db_user or not pwd_context.verify(password, db_user.hashed_password):
+    if not db_user or not pwd_context.verify(password,
+                                             db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     access_token = create_access_token({
@@ -63,17 +66,13 @@ def login(
         "role": db_user.role
     })
 
-    refresh_token = create_refresh_token({
-        "sub": email
-    })
+    refresh_token = create_refresh_token({"sub": email})
 
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
+        "refresh_token_value": refresh_token,
         "token_type": "bearer"
     }
-
-from app.dependencies import get_current_user
 
 
 @router.get("/me")
@@ -83,12 +82,10 @@ def get_me(current_user=Depends(get_current_user)):
         "role": current_user.role
     }
 
-from app.auth.jwt import verify_token
-
 
 @router.post("/refresh")
-def refresh_token(refresh_token: str):
-    payload = verify_token(refresh_token)
+def refresh_token(refresh_token_value: str):
+    payload = verify_token(refresh_token_value)
 
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
