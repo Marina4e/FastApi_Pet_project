@@ -49,3 +49,16 @@ Design Patterns — Erich Gamma — 1994
 📖 6. Подивитись книги
 GET:
 /books/
+
+
+
+Test 🧪 ENV=test alembic upgrade head (in Bash)
+ or
+   $env:ENV="test"
+   alembic upgrade head (in PowerShell)
+
+Ci/CD 🚀
+set ENV=test
+set DATABASE_URL=sqlite:///./test.db
+alembic upgrade head
+pytest -v

@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.articles import router as articles_router
 from app.auth.routes import router as auth_router
 from app.books import router as books_router
-from app.database import Base, engine
 
 app = FastAPI()
 
