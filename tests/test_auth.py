@@ -3,7 +3,7 @@ from app.settings import settings
 print("DB:", settings.DATABASE_URL)
 
 
-def test_register(client):
+def test_register(client, db):
     email = f"new_{uuid.uuid4()}@test.com"
 
     response = client.post("/register", json={

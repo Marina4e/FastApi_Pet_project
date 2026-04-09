@@ -1,41 +1,67 @@
 import os
 
+from app.auth.routes import get_db
+
 os.environ["ENV"] = "test"
 
 import sys
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import pytest
 import uuid
 from fastapi.testclient import TestClient
-from app.database import SessionLocal
-from app.main import app
-from app.models import User
-from passlib.context import CryptContext
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+from app.main import app
+from app.models import Base, User
+from passlib.context import CryptContext
+from sqlalchemy.pool import StaticPool
+
+# 🔐 пароль
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-from app.database import Base, engine
+# 🧪 тестовая БД
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+
+TestingSessionLocal = sessionmaker(bind=engine)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_db():
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+app.dependency_overrides[get_db] = override_get_db
+
+# ✅ ФИКСТУРА БД (ОДНА!)
+@pytest.fixture(scope="function")
+def db():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
+
+# ✅ клиент
 @pytest.fixture
 def client():
     return TestClient(app)
 
 
-@pytest.fixture
-def db():
-    db = SessionLocal()
-    yield db
-    db.close()
-
-
+# 👤 обычный пользователь
 @pytest.fixture
 def user_test(db):
     user = User(
@@ -45,9 +71,11 @@ def user_test(db):
     )
     db.add(user)
     db.commit()
+    db.refresh(user)
     return user
 
 
+# 👑 админ
 @pytest.fixture
 def admin_test(db):
     user = User(
@@ -57,9 +85,11 @@ def admin_test(db):
     )
     db.add(user)
     db.commit()
+    db.refresh(user)
     return user
 
 
+# 🔑 токен
 @pytest.fixture
 def get_token(client):
     def _get_token(email, password):
