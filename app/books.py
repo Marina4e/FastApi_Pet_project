@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.auth.schemas import BookOut, BookBase
+from app.auth.schemas import BookBase, BookOut
+from app.dependencies import get_current_user, get_db, require_admin
 from app.models import Book
-from app.dependencies import get_db, get_current_user, require_admin
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
@@ -11,15 +11,12 @@ router = APIRouter(prefix="/books", tags=["Books"])
 # 🔹 CREATE — тільки admin
 @router.post("/")
 def create_book(
-        book: BookBase,  # 👈 ВОТ СЮДА
-        db: Session = Depends(get_db),
-        user=Depends(require_admin)
+    book: BookBase,  # 👈 ВОТ СЮДА
+    db: Session = Depends(get_db),
+    user=Depends(require_admin),
 ):
     new_book = Book(
-        title=book.title,
-        author=book.author,
-        year=book.year,
-        owner_id=user.id
+        title=book.title, author=book.author, year=book.year, owner_id=user.id
     )
 
     db.add(new_book)
@@ -30,19 +27,16 @@ def create_book(
 
 # 🔹 GET — всі авторизовані
 @router.get("/", response_model=list[BookOut])
-def get_books(
-        db: Session = Depends(get_db),
-        user=Depends(get_current_user)
-):
+def get_books(db: Session = Depends(get_db), user=Depends(get_current_user)):
     return db.query(Book).all()
 
 
 @router.put("/{book_id}")
 def update_book(
-        book_id: int,
-        book: BookBase,  # 👈 ВОТ СЮДА
-        db: Session = Depends(get_db),
-        user=Depends(require_admin)
+    book_id: int,
+    book: BookBase,  # 👈 ВОТ СЮДА
+    db: Session = Depends(get_db),
+    user=Depends(require_admin),
 ):
     book_db = db.query(Book).filter(Book.id == book_id).first()
 
@@ -61,10 +55,10 @@ def update_book(
 
 @router.delete("/{book_id}")
 def delete_book(
-        book_id: int,
-        db: Session = Depends(get_db),
-        user=Depends(require_admin),
-        current_user=Depends(get_current_user)
+    book_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_admin),
+    current_user=Depends(get_current_user),
 ):
     book = db.query(Book).filter(Book.id == book_id).first()
 
@@ -85,9 +79,9 @@ def delete_book(
 
 @router.get("/{book_id}", response_model=BookOut)
 def get_book(
-        book_id: int,
-        db: Session = Depends(get_db),
-        user=Depends(get_current_user)  # 👈 ВОТ СЮДА
+    book_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),  # 👈 ВОТ СЮДА
 ):
     book = db.query(Book).filter(Book.id == book_id).first()
 

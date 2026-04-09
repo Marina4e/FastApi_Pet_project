@@ -69,3 +69,10 @@ jobs:
         run: |
           pip install pytest-cov
           pytest --cov=app
+
+      # 🔎 Линтер
+      - name: Lint
+        run: |
+          flake8 .
+          black --check .
+          isort --check-only .
